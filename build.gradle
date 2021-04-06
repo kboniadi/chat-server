@@ -20,4 +20,18 @@ test {
     useJUnitPlatform()
 }
 
+sourceSets {
+    main {
+        output.setResourcesDir(java.outputDir)
+    }
+}
+
+jar {
+    manifest {
+        attributes 'Main-Class': 'Server'
+    }
+    from {
+        configurations.runtimeClasspath.collect { it.isDirectory() ? it : zipTree(it) }
+    }
+}
 mainClassName = 'Server'

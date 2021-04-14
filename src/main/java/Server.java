@@ -64,10 +64,9 @@ public class Server {
                 while(true) {
                     JsonObject json = GsonWrapper.fromJson(buffer.readLine());
                     System.out.println(json);
-                    if (json != null && json.get("type").getAsString().equals("Submission")) {
-                        if (json.get("name").getAsString().equals("\\quit")) {
-                            return;
-                        }
+                    if (json == null) {
+                        return;
+                    } else if (json.get("type").getAsString().equals("Submission")) {
                         this.name = json.get("name").getAsString();
                         this.messages = GsonWrapper.fromJson(json.get("messages").getAsJsonArray().toString(), String[].class);
 
@@ -87,14 +86,16 @@ public class Server {
                 DataBus.publish("Message", MessageData.of(this.name + " has joined"));
                 while (true) {
                     JsonObject json = GsonWrapper.fromJson(buffer.readLine());
-                    if (json != null && json.get("type").getAsString().equals("Message")) {
+                    if (json == null) {
+                        break;
+                    } else if (json.get("type").getAsString().equals("Message")) {
                         if (json.get("message").getAsString().equals("\\quit")) {
-                            return;
+                            break;
                         }
                         DataBus.publish("Message", MessageData.of(this.name + ": " + json.get("message").getAsString()));
                     }
                 }
-            } catch (IOException e) {
+            } catch (Exception e) {
                 e.printStackTrace();
             } finally {
                 if (name != null && !name.isBlank()) {
